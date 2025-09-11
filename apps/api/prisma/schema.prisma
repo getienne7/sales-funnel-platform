@@ -1,0 +1,505 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Users and Authentication
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String?
+  emailVerified     Boolean   @default(false)
+  twoFactorEnabled  Boolean   @default(false)
+  twoFactorSecret   String?
+  
+  // Profile Information
+  firstName         String?
+  lastName          String?
+  avatar            String?
+  timezone          String    @default("UTC")
+  
+  // Subscription and Billing
+  subscriptionTier  SubscriptionTier @default(STARTUP)
+  subscriptionStatus SubscriptionStatus @default(TRIAL)
+  stripeCustomerId  String?
+  
+  // KYC and Compliance
+  kycStatus         KycStatus @default(PENDING)
+  kycProvider       String?
+  kycData           Json?
+  riskScore         Int       @default(0)
+  
+  // Timestamps
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  lastLoginAt       DateTime?
+  
+  // Relations
+  walletConnections WalletConnection[]
+  organizations     OrganizationMember[]
+  sessions          UserSession[]
+  apiKeys           ApiKey[]
+  
+  @@map("users")
+}
+
+model WalletConnection {
+  id              String    @id @default(cuid())
+  userId          String
+  walletAddress   String
+  walletType      WalletType
+  chainId         Int
+  isPrimary       Boolean   @default(false)
+  isVerified      Boolean   @default(false)
+  
+  // Metadata
+  label           String?
+  lastUsedAt      DateTime?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, walletAddress, chainId])
+  @@map("wallet_connections")
+}
+
+model UserSession {
+  id              String    @id @default(cuid())
+  userId          String
+  token           String    @unique
+  refreshToken    String?   @unique
+  expiresAt       DateTime
+  ipAddress       String?
+  userAgent       String?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_sessions")
+}
+
+// Organizations and Teams
+model Organization {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  description     String?
+  website         String?
+  logo            String?
+  
+  // Settings
+  settings        Json      @default("{}")
+  
+  // Billing
+  subscriptionTier SubscriptionTier @default(STARTUP)
+  billingEmail    String?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  members         OrganizationMember[]
+  funnels         Funnel[]
+  domains         CustomDomain[]
+  apiKeys         ApiKey[]
+  
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id              String    @id @default(cuid())
+  userId          String
+  organizationId  String
+  role            OrganizationRole @default(MEMBER)
+  
+  // Permissions
+  permissions     Json      @default("[]")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  user            User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, organizationId])
+  @@map("organization_members")
+}
+
+// Funnels and Pages
+model Funnel {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  slug            String
+  
+  // Configuration
+  status          FunnelStatus @default(DRAFT)
+  template        String?
+  config          Json      @default("{}")
+  
+  // SEO and Meta
+  metaTitle       String?
+  metaDescription String?
+  favicon         String?
+  
+  // Analytics
+  views           Int       @default(0)
+  conversions     Int       @default(0)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  publishedAt     DateTime?
+  
+  // Relations
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  pages           Page[]
+  leads           Lead[]
+  payments        CryptoPayment[]
+  abTests         AbTest[]
+  
+  @@unique([organizationId, slug])
+  @@map("funnels")
+}
+
+model Page {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String
+  
+  // Content and Design
+  content         Json      @default("{}")
+  styles          Json      @default("{}")
+  
+  // SEO
+  metaTitle       String?
+  metaDescription String?
+  customHead      String?
+  
+  // Configuration
+  pageType        PageType  @default(LANDING)
+  isPublished     Boolean   @default(false)
+  
+  // Analytics
+  views           Int       @default(0)
+  conversions     Int       @default(0)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  funnelId        String
+  funnel          Funnel    @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  
+  @@unique([funnelId, slug])
+  @@map("pages")
+}
+
+// Leads and CRM
+model Lead {
+  id              String    @id @default(cuid())
+  email           String
+  
+  // Contact Information
+  firstName       String?
+  lastName        String?
+  phone           String?
+  company         String?
+  
+  // Crypto Information
+  walletAddress   String?
+  preferredChain  String?
+  
+  // Lead Scoring and Segmentation
+  score           Int       @default(0)
+  tags            String[]  @default([])
+  customFields    Json      @default("{}")
+  
+  // Source Tracking
+  source          String?
+  medium          String?
+  campaign        String?
+  referrer        String?
+  
+  // Status
+  status          LeadStatus @default(NEW)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  funnelId        String
+  funnel          Funnel    @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  activities      LeadActivity[]
+  
+  @@unique([funnelId, email])
+  @@map("leads")
+}
+
+model LeadActivity {
+  id              String    @id @default(cuid())
+  type            ActivityType
+  description     String?
+  metadata        Json      @default("{}")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  
+  // Relations
+  leadId          String
+  lead            Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  @@map("lead_activities")
+}
+
+// Crypto Payments and Transactions
+model CryptoPayment {
+  id              String    @id @default(cuid())
+  
+  // Transaction Details
+  transactionHash String?
+  network         String
+  tokenContract   String?
+  tokenSymbol     String
+  amount          Decimal   @db.Decimal(36, 18)
+  usdValue        Decimal?  @db.Decimal(12, 2)
+  
+  // Payment Information
+  fromAddress     String
+  toAddress       String
+  gasUsed         String?
+  gasFee          Decimal?  @db.Decimal(36, 18)
+  
+  // Status and Processing
+  status          PaymentStatus @default(PENDING)
+  confirmations   Int       @default(0)
+  requiredConfirmations Int @default(6)
+  
+  // Metadata
+  purpose         String?
+  metadata        Json      @default("{}")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  confirmedAt     DateTime?
+  
+  // Relations
+  funnelId        String
+  funnel          Funnel    @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  
+  @@map("crypto_payments")
+}
+
+// A/B Testing
+model AbTest {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  
+  // Test Configuration
+  variants        Json      // Array of variant configurations
+  trafficSplit    Json      // Traffic allocation percentages
+  
+  // Status and Results
+  status          TestStatus @default(DRAFT)
+  winningVariant  String?
+  
+  // Metrics
+  totalViews      Int       @default(0)
+  totalConversions Int      @default(0)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  startedAt       DateTime?
+  endedAt         DateTime?
+  
+  // Relations
+  funnelId        String
+  funnel          Funnel    @relation(fields: [funnelId], references: [id], onDelete: Cascade)
+  
+  @@map("ab_tests")
+}
+
+// Custom Domains
+model CustomDomain {
+  id              String    @id @default(cuid())
+  domain          String    @unique
+  
+  // SSL Configuration
+  sslStatus       SslStatus @default(PENDING)
+  sslCertificate  String?
+  
+  // DNS Configuration
+  dnsConfigured   Boolean   @default(false)
+  
+  // Status
+  isActive        Boolean   @default(false)
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  verifiedAt      DateTime?
+  
+  // Relations
+  organizationId  String
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@map("custom_domains")
+}
+
+// API Keys and Integrations
+model ApiKey {
+  id              String    @id @default(cuid())
+  name            String
+  keyHash         String    @unique
+  
+  // Permissions and Scope
+  permissions     Json      @default("[]")
+  scopes          String[]  @default([])
+  
+  // Usage Tracking
+  lastUsedAt      DateTime?
+  usageCount      Int       @default(0)
+  
+  // Status
+  isActive        Boolean   @default(true)
+  expiresAt       DateTime?
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  // Relations
+  userId          String?
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId  String?
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  @@map("api_keys")
+}
+
+// Enums
+enum SubscriptionTier {
+  TRIAL
+  STARTUP
+  GROWTH
+  ENTERPRISE
+  WHALE
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+}
+
+enum KycStatus {
+  PENDING
+  IN_PROGRESS
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum WalletType {
+  METAMASK
+  WALLETCONNECT
+  COINBASE_WALLET
+  PHANTOM
+  KEPLR
+  TRUST_WALLET
+  LEDGER
+  TREZOR
+}
+
+enum OrganizationRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+enum FunnelStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  PAUSED
+}
+
+enum PageType {
+  LANDING
+  OPTIN
+  SALES
+  CHECKOUT
+  THANKYOU
+  UPSELL
+  DOWNSELL
+  WEBINAR
+  SURVEY
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum ActivityType {
+  PAGE_VIEW
+  FORM_SUBMIT
+  EMAIL_OPEN
+  EMAIL_CLICK
+  PAYMENT_MADE
+  WALLET_CONNECTED
+  TOKEN_GATED_ACCESS
+}
+
+enum PaymentStatus {
+  PENDING
+  CONFIRMING
+  CONFIRMED
+  FAILED
+  EXPIRED
+}
+
+enum TestStatus {
+  DRAFT
+  RUNNING
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum SslStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  EXPIRED
+}

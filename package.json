@@ -1,0 +1,48 @@
+{
+  "name": "crypto-sales-funnel-platform",
+  "version": "1.0.0",
+  "description": "Comprehensive sales funnel platform for cryptocurrency businesses",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "lint": "turbo run lint",
+    "clean": "turbo run clean",
+    "docker:dev": "docker-compose -f docker-compose.dev.yml up",
+    "docker:prod": "docker-compose up",
+    "db:migrate": "cd apps/api && npx prisma migrate dev",
+    "db:generate": "cd apps/api && npx prisma generate",
+    "db:seed": "cd apps/api && npx prisma db seed"
+  },
+  "devDependencies": {
+    "turbo": "^1.10.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/crypto-sales-funnel-platform"
+  },
+  "keywords": [
+    "crypto",
+    "sales-funnel",
+    "web3",
+    "blockchain",
+    "defi",
+    "nft",
+    "marketing"
+  ],
+  "author": "Your Organization",
+  "license": "MIT"
+}
