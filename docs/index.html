@@ -44,6 +44,69 @@
             transform: translateY(-2px);
             transition: all 0.3s ease;
         }
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .pulse-glow {
+            animation: pulseGlow 2s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+        }
+        .slide-in-left {
+            animation: slideInLeft 0.8s ease-out;
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .slide-in-right {
+            animation: slideInRight 0.8s ease-out;
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .scale-on-hover:hover {
+            transform: scale(1.05);
+            transition: all 0.3s ease;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .stats-counter {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        .typing-animation {
+            border-right: 2px solid #3b82f6;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: #3b82f6; }
+        }
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #3b82f6;
+            border-radius: 50%;
+            animation: particle 4s linear infinite;
+        }
+        @keyframes particle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -94,11 +157,14 @@
 
     <!-- Hero Section -->
     <div class="relative isolate px-6 pt-14 lg:px-8">
+        <!-- Floating particles background -->
+        <div id="particles-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+        
         <div class="mx-auto max-w-4xl py-32 sm:py-48 lg:py-56 fade-in">
             <div class="text-center">
                 <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
                     The First
-                    <span class="crypto-gradient bg-clip-text text-transparent">
+                    <span class="crypto-gradient bg-clip-text text-transparent floating">
                         Crypto-Native
                     </span>
                     Sales Funnel Platform
@@ -108,7 +174,7 @@
                     Accept crypto payments, integrate with Web3 wallets, and track on-chain analytics - all in one platform.
                 </p>
                 <div class="mt-10 flex items-center justify-center gap-x-6 flex-wrap">
-                    <a href="#register" class="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 flex items-center gap-2 hover-lift transition-all">
+                    <a href="#register" class="rounded-md bg-primary-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 flex items-center gap-2 hover-lift pulse-glow transition-all">
                         Start Building Funnels
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -118,6 +184,40 @@
                         View Demo <span aria-hidden="true">→</span>
                     </a>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="bg-white py-24 sm:py-32">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="mx-auto max-w-2xl lg:max-w-none">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl fade-in">
+                        Trusted by Crypto Innovators
+                    </h2>
+                    <p class="mt-4 text-lg leading-8 text-gray-600 fade-in">
+                        Join thousands of crypto businesses already using CryptoFunnel
+                    </p>
+                </div>
+                <dl class="mt-16 grid grid-cols-1 gap-0.5 overflow-hidden rounded-2xl text-center sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="flex flex-col bg-gray-400/5 p-8 fade-in hover-lift">
+                        <dt class="text-sm font-semibold leading-6 text-gray-600">Active Funnels</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 stats-counter" data-target="12500">0</dd>
+                    </div>
+                    <div class="flex flex-col bg-gray-400/5 p-8 fade-in hover-lift">
+                        <dt class="text-sm font-semibold leading-6 text-gray-600">Crypto Processed</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 stats-counter" data-target="250" data-suffix="M+">0</dd>
+                    </div>
+                    <div class="flex flex-col bg-gray-400/5 p-8 fade-in hover-lift">
+                        <dt class="text-sm font-semibold leading-6 text-gray-600">Conversion Rate</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 stats-counter" data-target="34" data-suffix="%">0</dd>
+                    </div>
+                    <div class="flex flex-col bg-gray-400/5 p-8 fade-in hover-lift">
+                        <dt class="text-sm font-semibold leading-6 text-gray-600">Supported Chains</dt>
+                        <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 stats-counter" data-target="15" data-suffix="+">0</dd>
+                    </div>
+                </dl>
             </div>
         </div>
     </div>
@@ -389,6 +489,119 @@
                     }, 2000);
                 }
             });
+        });
+
+        // Animated counter for statistics
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const suffix = element.getAttribute('data-suffix') || '';
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current).toLocaleString() + suffix;
+            }, 16);
+        }
+
+        // Trigger counters when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counters = entry.target.querySelectorAll('.stats-counter');
+                    counters.forEach(counter => {
+                        if (!counter.classList.contains('animated')) {
+                            counter.classList.add('animated');
+                            animateCounter(counter);
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // Observe stats section
+        const statsSection = document.querySelector('.stats-counter').closest('div').closest('div').closest('div');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Create floating particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 4 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            const container = document.getElementById('particles-container');
+            if (container) {
+                container.appendChild(particle);
+                
+                // Remove particle after animation
+                setTimeout(() => {
+                    if (particle.parentNode) {
+                        particle.parentNode.removeChild(particle);
+                    }
+                }, 6000);
+            }
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 800);
+
+        // Add interactive hover effects to feature cards
+        document.querySelectorAll('.hover-lift').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+                this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.boxShadow = '';
+            });
+        });
+
+        // Add typing effect to hero subtitle (optional enhancement)
+        function typeWriter(element, text, speed = 50) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        // Enhanced scroll animations with stagger effect
+        const staggerObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Apply stagger effect to feature cards
+        document.querySelectorAll('.fade-in').forEach((el, index) => {
+            if (el.closest('#features') || el.closest('.bg-gray-50')) {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                staggerObserver.observe(el);
+            }
         });
     </script>
 </body>
