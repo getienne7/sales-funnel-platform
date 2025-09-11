@@ -425,10 +425,19 @@
             });
         }
 
-        // Initialize form handlers
-        handleFormSubmission('trialForm', 'trial-success', 'free_trial');
-        handleFormSubmission('salesForm', 'sales-success', 'sales_contact');
-        handleFormSubmission('supportForm', 'support-success', 'support_request');
+        // Initialize form handlers when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Only initialize handlers for forms that exist
+            if (document.getElementById('trialForm')) {
+                handleFormSubmission('trialForm', 'trial-success', 'free_trial');
+            }
+            if (document.getElementById('salesForm')) {
+                handleFormSubmission('salesForm', 'sales-success', 'sales_contact');
+            }
+            if (document.getElementById('supportForm')) {
+                handleFormSubmission('supportForm', 'support-success', 'support_request');
+            }
+        });
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
