@@ -146,13 +146,13 @@
                     </button>
                 </div>
                 <div class="hidden lg:flex lg:gap-x-12">
-                    <a href="https://getienne7.github.io/sales-funnel-platform/features.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Features</a>
-                    <a href="https://getienne7.github.io/sales-funnel-platform/pricing.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Pricing</a>
-                    <a href="https://getienne7.github.io/sales-funnel-platform/contact.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Contact</a>
+                    <a href="features.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Features</a>
+                    <a href="pricing.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Pricing</a>
+                    <a href="contact.html" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Contact</a>
                 </div>
                 <div class="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-x-6">
                     <a href="#login" class="text-sm font-semibold leading-6 text-gray-900 hover:text-primary-600 transition-colors">Log in</a>
-                    <a href="https://getienne7.github.io/sales-funnel-platform/contact.html" class="rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 hover-lift transition-all">
+                    <a href="contact.html" class="rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 hover-lift transition-all">
                         Get Started
                     </a>
 
@@ -454,160 +454,6 @@
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
-
-
-
-        // Intersection Observer for fade-in animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observe all fade-in elements
-        document.querySelectorAll('.fade-in').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            observer.observe(el);
-        });
-
-        // Add loading state to buttons
-        document.querySelectorAll('a[href="#register"], a[href="#contact"]').forEach(button => {
-            button.addEventListener('click', function(e) {
-                if (this.getAttribute('href') === '#register' || this.getAttribute('href') === '#contact') {
-                    e.preventDefault();
-                    const originalText = this.textContent;
-                    this.textContent = 'Coming Soon...';
-                    this.style.opacity = '0.7';
-                    setTimeout(() => {
-                        this.textContent = originalText;
-                        this.style.opacity = '1';
-                    }, 2000);
-                }
-            });
-        });
-
-        // Animated counter for statistics
-        function animateCounter(element) {
-            const target = parseInt(element.getAttribute('data-target'));
-            const suffix = element.getAttribute('data-suffix') || '';
-            const duration = 2000;
-            const increment = target / (duration / 16);
-            let current = 0;
-
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                element.textContent = Math.floor(current).toLocaleString() + suffix;
-            }, 16);
-        }
-
-        // Trigger counters when stats section is visible
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const counters = entry.target.querySelectorAll('.stats-counter');
-                    counters.forEach(counter => {
-                        if (!counter.classList.contains('animated')) {
-                            counter.classList.add('animated');
-                            animateCounter(counter);
-                        }
-                    });
-                }
-            });
-        }, { threshold: 0.5 });
-
-        // Observe stats section
-        const statsSection = document.querySelector('.stats-counter').closest('div').closest('div').closest('div');
-        if (statsSection) {
-            statsObserver.observe(statsSection);
-        }
-
-        // Create floating particles
-        function createParticle() {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 4 + 's';
-            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            
-            const container = document.getElementById('particles-container');
-            if (container) {
-                container.appendChild(particle);
-                
-                // Remove particle after animation
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        particle.parentNode.removeChild(particle);
-                    }
-                }, 6000);
-            }
-        }
-
-        // Create particles periodically
-        setInterval(createParticle, 800);
-
-        // Add interactive hover effects to feature cards
-        document.querySelectorAll('.hover-lift').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-8px) scale(1.02)';
-                this.style.boxShadow = '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)';
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
-                this.style.boxShadow = '';
-            });
-        });
-
-        // Add typing effect to hero subtitle (optional enhancement)
-        function typeWriter(element, text, speed = 50) {
-            let i = 0;
-            element.innerHTML = '';
-            
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
-
-        // Enhanced scroll animations with stagger effect
-        const staggerObserver = new IntersectionObserver((entries) => {
-            entries.forEach((entry, index) => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, index * 100);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        // Apply stagger effect to feature cards
-        document.querySelectorAll('.fade-in').forEach((el, index) => {
-            if (el.closest('#features') || el.closest('.bg-gray-50')) {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(30px)';
-                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                staggerObserver.observe(el);
-            }
-        });
     </script>
 </body>
 </html>
