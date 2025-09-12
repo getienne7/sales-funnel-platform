@@ -372,9 +372,11 @@
     </footer>
 
     <script>
+        // Cache-busting comment: 2023-10-27 10:00
         // Analytics tracking function
         function trackEvent(eventName, properties = {}) {
             console.log('Analytics Event:', eventName, properties);
+
             // In a real implementation, this would send to your analytics service
             // Example: analytics.track(eventName, properties);
         }
@@ -437,7 +439,11 @@
             if (document.getElementById('supportForm')) {
                 handleFormSubmission('supportForm', 'support-success', 'support_request');
             }
+
+            // Initialize form validation
+            addFormValidation();
         });
+
 
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -504,10 +510,14 @@
             
             forms.forEach(formId => {
                 const form = document.getElementById(formId);
-                const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
-                
-                inputs.forEach(input => {
-                    input.addEventListener('blur', function() {
+                console.log('Checking form:', formId, form);
+                if (form) {
+                    const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+                    
+                    inputs.forEach(input => {
+                        input.addEventListener('blur', function() {
+
+
                         validateField(this);
                     });
                     
@@ -517,8 +527,10 @@
                         }
                     });
                 });
+                }
             });
         }
+
 
         function validateField(field) {
             const isValid = field.checkValidity();
@@ -546,8 +558,7 @@
             }
         }
 
-        // Initialize form validation
-        addFormValidation();
+
 
         // Track form field interactions
         document.querySelectorAll('input, textarea, select').forEach(field => {
